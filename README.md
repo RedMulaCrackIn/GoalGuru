@@ -67,12 +67,28 @@ Esegui lo script `data_preprocessing.py` per pulire e trasformare i dati. Questo
 ## 3. Addestramento del modello
 Addestra la rete neurale utilizzando lo script `train_model.py`. Puoi configurare i parametri del modello modificando le variabili all'inizio del file.
 
-Per eseguire l'addestramento, utilizza il seguente comando:
-```bash
-python train_model.py
+  Esegui il comando:
+  ```bash
+  python train_model.py
+  ```
+
+## 4. Valutazione
+Testa il modello sui dati di validazione per valutare le sue performance. Usa lo script evaluate_model.py per generare metriche come accuratezza e confusion matrix.
+
+  Esegui il comando:
+  ```bash
+  python evaluate_model.py
+  ```
+
+## 5. Predizioni
+Genera previsioni sui nuovi dati utilizzando lo script predict.py. Fornisci un input personalizzato per ottenere le probabilità predette per vittoria, pareggio o sconfitta.
+
+  Esegui il comando:
+  ```bash
+  python predict.py
+  ```
 
 
-  
 
 
 
