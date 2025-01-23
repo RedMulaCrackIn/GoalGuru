@@ -65,3 +65,44 @@ grid_combinations = list(itertools.product(
     GRID_SEARCH['weights'],
     GRID_SEARCH['metric']
 ))
+
+# Variabili per tenere traccia dei migliori iperparametri
+best_params = None
+best_val_accuracy = 0
+
+# Lista per memorizzare le accuracy durante l'addestramento
+val_accuracies = []
+
+# Ciclo per testare ogni combinazione di iperparametri
+for combination in grid_combinations:
+    n_neighbors, weights, metric = combination
+
+    print(f"Testing combination: n_neighbors={n_neighbors}, weights={weights}, metric={metric}")
+
+    # Creazione del modello KNN con i parametri correnti
+    model = KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, metric=metric)
+
+    # Addestramento del modello
+    model.fit(X_train, y_train)
+
+    # Valutazione dell'accuratezza sul validation set
+    val_accuracy = model.score(X_val, y_val)
+
+    # Aggiungi l'accuratezza alla lista
+    val_accuracies.append(val_accuracy)
+
+    print(f"Validation accuracy: {val_accuracy}")
+
+    # Aggiornamento dei migliori iperparametri
+    if val_accuracy > best_val_accuracy:
+        best_val_accuracy = val_accuracy
+        best_params = {
+            "n_neighbors": n_neighbors,
+            "weights": weights,
+            "metric": metric
+        }
+
+# Stampa dei migliori iperparametri
+print("Best hyperparameters found:")
+print(best_params)
+print(f"Best validation accuracy: {best_val_accuracy}")
