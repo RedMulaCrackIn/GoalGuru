@@ -91,7 +91,6 @@ grid_combinations = list(itertools.product(
 best_params = None
 best_val_loss = np.inf
 
-
 # Ciclo per testare ogni combinazione di iperparametri
 for combination in grid_combinations:
     learning_rate, epochs, neurons_1layer, neurons_2layer, activation_function, batch_size = combination
