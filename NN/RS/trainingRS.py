@@ -26,3 +26,16 @@ y = tr['result']
 # Identificazione delle colonne categoriche e numeriche
 categorical_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
 numerical_cols = X.select_dtypes(include=['float64', 'int64']).columns.tolist()
+
+# One-Hot Encoding per le variabili categoriche
+X_categorical_encoded = pd.get_dummies(X[categorical_cols], columns=categorical_cols)
+
+# Standardizzazione delle variabili numeriche
+scaler = StandardScaler()
+X_numerical_scaled = pd.DataFrame(scaler.fit_transform(X[numerical_cols]), columns=numerical_cols)
+
+# Unione delle variabili categoriche codificate e numeriche standardizzate
+X_categorical_encoded = X_categorical_encoded.reset_index(drop=True)
+X_numerical_scaled = X_numerical_scaled.reset_index(drop=True)
+X_final = pd.concat([X_categorical_encoded, X_numerical_scaled], axis=1)
+
