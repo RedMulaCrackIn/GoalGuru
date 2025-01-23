@@ -44,3 +44,24 @@ test_x = X_final.tail(761)
 test_y = y_encoded[-761:]
 test_x['result'] = test_y
 test_x.to_csv("test_set.csv", index=False)
+
+# Rimozione dell'ultima stagione dal training set
+X_final = X_final.iloc[:-761]
+y_encoded = y_encoded[:-761]
+
+# Divisione in training e validation set
+X_train, X_val, y_train, y_val = train_test_split(X_final, y_encoded, test_size=0.2, random_state=42)
+
+# Griglia di iperparametri per KNN
+GRID_SEARCH = {
+    "n_neighbors": [3, 5, 7, 9, 11],  # Numero di vicini
+    "weights": ['uniform', 'distance'],  # Peso dei vicini
+    "metric": ['euclidean', 'manhattan']  # Metrica di distanza
+}
+
+# Creazione di tutte le combinazioni di iperparametri
+grid_combinations = list(itertools.product(
+    GRID_SEARCH['n_neighbors'],
+    GRID_SEARCH['weights'],
+    GRID_SEARCH['metric']
+))
