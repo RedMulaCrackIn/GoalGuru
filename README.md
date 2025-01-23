@@ -16,6 +16,7 @@ Il repository contiene le seguenti risorse:
 - **Codice principale**: Script Python per l'elaborazione, il training e l'inferenza del modello.
 - **Dataset**: file per accedere al dataset utilizzato 
 - **Risultati**: Report e visualizzazioni delle performance del modello.
+- **Notebook**: File `.ipynb` per analisi ed esplorazione interattiva dei dati.
 - **Documentazione**: Dettagli sui processi di modellazione e sperimentazione.
 
 ---
