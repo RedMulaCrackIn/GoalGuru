@@ -132,3 +132,19 @@ for combination in grid_combinations:
             "activation_function": activation_function,
             "batch_size": batch_size
         }
+
+# Stampa dei migliori iperparametri
+print("Best hyperparameters found:")
+print(best_params)
+print(f"Best validation loss: {best_val_loss}")
+
+# Migliori iperparametri trovati
+#best_params = {'learning_rate': 0.001, 'epochs': 8, 'neurons_1layer': 55, 'neurons_2layer': 50, 'activation_function': 'relu', 'batch_size': 200}
+
+# Creazione del modello con i migliori iperparametri
+best_model = create_network(
+    X_train.shape[1],
+    best_params["neurons_1layer"],
+    best_params["neurons_2layer"],
+    best_params["activation_function"]
+)
