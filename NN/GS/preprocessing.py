@@ -254,3 +254,17 @@ df_sorted.dropna(inplace=True)
 # Pulizia dei nomi delle colonne
 df_sorted.columns = df_sorted.columns.str.strip()
 df_sorted = df_sorted[df_sorted.columns.tolist()[1:]]
+
+# Categorizzazione della colonna 'time'
+df_sorted['time'] = df_sorted['time'].astype('category')
+value_counts = df_sorted.time.value_counts()
+to_replace = value_counts[value_counts < 102].index
+df_sorted['time'] = df_sorted['time'].replace(to_replace, 'Altro')
+
+# Aggiornamento delle colonne categoriche e numeriche
+cat_cols = df_sorted.select_dtypes(exclude=np.number).columns.tolist()
+num_cols = df_sorted.select_dtypes(include=np.number).columns.tolist()
+predictors = num_cols + cat_cols
+
+# Salvataggio del dataset pre-processato
+df_sorted.to_csv('matches_final.csv', index=False)
