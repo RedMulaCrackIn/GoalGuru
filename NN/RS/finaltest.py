@@ -32,3 +32,28 @@ y_pred_classes = np.argmax(y_pred, axis=1)
 print("\nReport di classificazione:")
 print(classification_report(ts_y, y_pred_classes))
 
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Calcolo della matrice di confusione
+conf_matrix = confusion_matrix(ts_y, y_pred_classes)
+
+# Visualizzazione della matrice di confusione
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
+            xticklabels=['Loss', 'Draw', 'Win'],
+            yticklabels=['Loss', 'Draw', 'Win'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Matrice di Confusione')
+# Salva la figura in un file
+plt.savefig('matrice_di_confusione.png')
+plt.show()
+
+# Salvataggio dei risultati in un file di testo
+with open("test_results.txt", "w") as f:
+    f.write(f"Test loss: {test_loss}\n")
+    f.write(f"Test accuracy: {test_accuracy}\n")
+    f.write("\nReport di classificazione:\n")
+    f.write(classification_report(ts_y, y_pred_classes))
