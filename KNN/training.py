@@ -29,3 +29,18 @@ X_categorical_encoded = pd.get_dummies(X[categorical_cols], columns=categorical_
 # Standardizzazione delle variabili numeriche
 scaler = StandardScaler()
 X_numerical_scaled = pd.DataFrame(scaler.fit_transform(X[numerical_cols]), columns=numerical_cols)
+
+# Unione delle variabili categoriche codificate e numeriche standardizzate
+X_categorical_encoded = X_categorical_encoded.reset_index(drop=True)
+X_numerical_scaled = X_numerical_scaled.reset_index(drop=True)
+X_final = pd.concat([X_categorical_encoded, X_numerical_scaled], axis=1)
+
+# Codifica del target (y) in valori numerici
+label_encoder = LabelEncoder()
+y_encoded = label_encoder.fit_transform(y)
+
+# Creazione del test set (ultima stagione)
+test_x = X_final.tail(761)
+test_y = y_encoded[-761:]
+test_x['result'] = test_y
+test_x.to_csv("test_set.csv", index=False)
