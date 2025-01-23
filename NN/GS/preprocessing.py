@@ -81,3 +81,19 @@ winners = df.groupby(['season', 'team'], observed=False)['points'].sum().reset_i
 
 # Aggiunta della colonna 'season_winner' per indicare il vincitore della stagione
 df['season_winner'] = df['season'].map(winners['team'])
+
+# Funzione per gestire i valori mancanti nella colonna 'captain'
+def captains_func(data):
+    if data['count'] == 0:
+        data['count'] = np.nan
+    return data
+
+# Conteggio dei capitani per squadra
+group = df.groupby('team', observed=False)['captain'].value_counts().reset_index(name='count')
+group = group.apply(captains_func, axis=1)
+group.dropna(inplace=True)
+group = group.drop(columns='count')
+
+# Esempio: Capitani del Liverpool
+print("\nCapitani del Liverpool:")
+print(group[group['team'] == 'Liverpool'])
