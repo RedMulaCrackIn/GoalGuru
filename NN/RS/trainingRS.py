@@ -139,3 +139,26 @@ print("Best hyperparameters found:")
 print(best_params)
 print(f"Best validation loss: {best_val_loss}")
 
+# Creazione del modello con i migliori iperparametri
+best_model = create_network(
+    X_train.shape[1],
+    best_params["neurons_1layer"],
+    best_params["neurons_2layer"],
+    best_params["activation_function"]
+)
+
+# Compilazione del modello
+best_model.compile(
+    loss='sparse_categorical_crossentropy',
+    optimizer=tf.keras.optimizers.Adam(learning_rate=best_params["learning_rate"]),
+    metrics=['accuracy']
+)
+
+# Addestramento del modello
+best_history = best_model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=best_params["epochs"],
+    batch_size=best_params["batch_size"],
+    verbose=1  # Mostra il progresso
+)
