@@ -224,3 +224,35 @@ def categorize_time(time):
         return 'afternoon'
     else:
         return 'evening'
+
+
+
+# Pulizia della colonna 'time' e applicazione della categorizzazione
+df_sorted['time'] = df_sorted['time'].apply(lambda x: x.split(' ')[0])
+df_sorted['time_condition'] = df_sorted['time'].apply(categorize_time)
+
+# Conteggio delle partite per fascia oraria
+print("\nConteggio delle partite per fascia oraria:")
+print(df_sorted['time_condition'].value_counts())
+
+# Calcolo dei giorni trascorsi dall'ultima partita
+df_sorted['days_since_last_match'] = df_sorted.groupby('team', observed=False)['date'].diff().dt.days
+df_sorted['days_since_last_match'] = df_sorted['days_since_last_match'].fillna(0)
+
+# Rimozione delle colonne non necessarie
+columns_to_drop = ['gf', 'ga', 'xg', 'xga', 'poss', 'sh', 'sot',
+                   'goal_diff', 'day', 'pk', 'pkatt', 'fk',
+                   'referee', 'dist','points', 'season_winner', 'hour', 'result_encoded', 'day_code']
+df_sorted = df_sorted.drop(columns=columns_to_drop)
+
+# Selezione delle colonne numeriche e categoriche
+num_cols = df_sorted.select_dtypes(include=np.number).columns
+num_cols = num_cols.drop(['season'])
+num_cols = num_cols.tolist()
+cat_cols = df_sorted.select_dtypes(exclude=np.number).columns
+cat_cols = cat_cols.drop(['result', 'date'])
+cat_cols = cat_cols.tolist()
+predictors = num_cols + cat_cols
+
+# Rimozione delle righe con valori mancanti
+df_sorted.dropna(inplace=True)
