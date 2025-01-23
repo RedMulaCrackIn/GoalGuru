@@ -97,3 +97,113 @@ group = group.drop(columns='count')
 # Esempio: Capitani del Liverpool
 print("\nCapitani del Liverpool:")
 print(group[group['team'] == 'Liverpool'])
+
+# Conversione della colonna 'date' in formato datetime (se non già fatto)
+df['date'] = pd.to_datetime(df['date'])
+
+# Ordinamento del dataset per squadra e data
+df_sorted = df.sort_values(['team', 'date'])
+
+# Reset dell'indice per riflettere il nuovo ordine
+df_sorted = df_sorted.reset_index(drop=True)
+
+# Funzione per verificare l'ordinamento corretto
+def verify_sorting(data):
+    is_sorted = data.groupby('team', observed=False)['date'].is_monotonic_increasing.all()
+    if is_sorted:
+        print("Data is correctly sorted by date for each team.")
+    else:
+        print("WARNING: Data is not correctly sorted. Please check for inconsistencies.")
+
+# Verifica dell'ordinamento
+verify_sorting(df_sorted)
+
+# Conversione delle colonne numeriche in tipo float
+num_cols = ['sh', 'sot', 'dist', 'fk', 'pk', 'pkatt', 'xga', 'xg', 'gf', 'ga']
+for col in num_cols:
+    df_sorted[col] = pd.to_numeric(df_sorted[col])
+
+# Funzione per calcolare le metriche avanzate
+def calculate_fk_pk_ratios(data):
+    data['fk_ratio'] = data['fk'] / data['sh']
+    data['pk_conversion_rate'] = data['pk'] / data['pkatt']
+    data['pk_per_shot'] = data['pkatt'] / data['sh']
+
+    # Gestione dei valori infiniti
+    data['fk_ratio'] = data['fk_ratio'].replace([np.inf, -np.inf], np.nan)
+    data['pk_conversion_rate'] = data['pk_conversion_rate'].replace([np.inf, -np.inf], np.nan)
+    data['pk_per_shot'] = data['pk_per_shot'].replace([np.inf, -np.inf], np.nan)
+
+    # Conversione in percentuali
+    data['fk_percentage'] = data['fk_ratio'] * 100
+    data['pk_conversion_percentage'] = data['pk_conversion_rate'] * 100
+    data['pk_per_shot_percentage'] = data['pk_per_shot'] * 100
+
+    return data
+
+# Applicazione della funzione
+df_sorted = calculate_fk_pk_ratios(df_sorted)
+
+# Rimozione delle colonne non necessarie
+df_sorted.drop(['pk_conversion_rate', 'pk_conversion_percentage'], axis=1, inplace=True)
+
+# Creazione di una figura con 4 subplot
+fig, axs = plt.subplots(2, 2, figsize=(12, 6))
+i = 0
+for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']:
+    sns.histplot(df_sorted[col], kde=True, ax=axs.flatten()[i])
+    axs.flatten()[i].set_title('Distribuzione di ' + col)
+    i += 1
+
+plt.tight_layout()
+plt.show()
+
+# Boxplot per le stesse metriche
+fig, axs = plt.subplots(2, 2, figsize=(12, 6))
+i = 0
+for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']:
+    sns.boxplot(x=df_sorted[col], ax=axs.flatten()[i])
+    axs.flatten()[i].set_title('Distribuzione di ' + col)
+    i += 1
+
+# Statistiche descrittive delle metriche
+print("\nStatistiche delle metriche calcolate:")
+print(df_sorted[['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']].agg(['mean', 'min', 'max']))
+
+plt.tight_layout()
+plt.show()
+
+# Funzione per calcolare la media mobile
+def calculate_rolling_average(data, column, window=5):
+    return data.groupby('team', observed=False)[column].transform(
+        lambda x: x.rolling(window=window, min_periods=1).mean()
+    )
+
+# Applicazione della funzione alle colonne selezionate
+df_sorted['rolling_xg'] = calculate_rolling_average(df_sorted, 'xg')
+df_sorted['rolling_xga'] = calculate_rolling_average(df_sorted, 'xga')
+df_sorted['rolling_poss'] = calculate_rolling_average(df_sorted, 'poss')
+df_sorted['rolling_sh'] = calculate_rolling_average(df_sorted, 'sh')
+df_sorted['rolling_sot'] = calculate_rolling_average(df_sorted, 'sot')
+df_sorted['rolling_dist'] = calculate_rolling_average(df_sorted, 'dist')
+
+
+# Codifica del risultato in valori numerici (W = 1, D = 0, L = -1)
+df_sorted['result_encoded'] = pd.to_numeric(df_sorted['result'].map({'W': 1, 'D': 0, 'L': -1}))
+
+# Calcolo della forma (media mobile dei risultati)
+df_sorted['form'] = calculate_rolling_average(df_sorted, 'result_encoded')
+
+# Calcolo della differenza reti e della sua media mobile
+df_sorted['goal_diff'] = df_sorted['gf'] - df_sorted['ga']
+df_sorted['rolling_goal_diff'] = calculate_rolling_average(df_sorted, 'goal_diff')
+
+# Funzione per calcolare il confronto diretto
+def get_head_to_head(data):
+    h2h = data.groupby(['team', 'opponent'], observed=False)['result_encoded'].mean().reset_index()
+    h2h = h2h.rename(columns={'result_encoded': 'h2h_record'})
+    result = pd.merge(data, h2h, on=['team', 'opponent'], how='left')
+    return result
+
+# Applicazione della funzione
+df_sorted = get_head_to_head(df_sorted)
