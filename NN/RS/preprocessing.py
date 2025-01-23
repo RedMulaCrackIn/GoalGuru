@@ -113,3 +113,21 @@ df_sorted = df.sort_values(['team', 'date'])
 # Reset dell'indice per riflettere il nuovo ordine
 df_sorted = df_sorted.reset_index(drop=True)
 
+
+
+# Funzione per verificare l'ordinamento corretto
+def verify_sorting(data):
+    is_sorted = data.groupby('team', observed=False)['date'].is_monotonic_increasing.all()
+    if is_sorted:
+        print("Data is correctly sorted by date for each team.")
+    else:
+        print("WARNING: Data is not correctly sorted. Please check for inconsistencies.")
+
+# Verifica dell'ordinamento
+verify_sorting(df_sorted)
+
+# Conversione delle colonne numeriche in tipo float
+num_cols = ['sh', 'sot', 'dist', 'fk', 'pk', 'pkatt', 'xga', 'xg', 'gf', 'ga']
+for col in num_cols:
+    df_sorted[col] = pd.to_numeric(df_sorted[col])
+
