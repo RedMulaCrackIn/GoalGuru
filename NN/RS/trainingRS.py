@@ -162,3 +162,26 @@ best_history = best_model.fit(
     batch_size=best_params["batch_size"],
     verbose=1  # Mostra il progresso
 )
+
+
+# Valutazione del modello sul validation set
+final_val_loss = best_history.history['val_loss'][-1]
+final_val_accuracy = best_history.history['val_accuracy'][-1]
+
+print(f"Final validation loss with best hyperparameters: {final_val_loss}")
+print(f"Final validation accuracy with best hyperparameters: {final_val_accuracy}")
+
+# Plot della loss durante l'addestramento
+plt.figure(figsize=(8, 6))
+plt.plot(best_history.history['loss'], label='Train Loss')
+plt.plot(best_history.history['val_loss'], label='Validation Loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+# Salva la figura in un file
+plt.savefig('model_loss.png')
+plt.show()
+
+# Salvataggio del modello
+best_model.save("best_model.h5")
