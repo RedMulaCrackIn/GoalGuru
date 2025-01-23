@@ -145,3 +145,20 @@ def calculate_fk_pk_ratios(data):
     data['pk_per_shot_percentage'] = data['pk_per_shot'] * 100
 
     return data
+
+# Applicazione della funzione
+df_sorted = calculate_fk_pk_ratios(df_sorted)
+
+# Rimozione delle colonne non necessarie
+df_sorted.drop(['pk_conversion_rate', 'pk_conversion_percentage'], axis=1, inplace=True)
+
+# Creazione di una figura con 4 subplot
+fig, axs = plt.subplots(2, 2, figsize=(12, 6))
+i = 0
+for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']:
+    sns.histplot(df_sorted[col], kde=True, ax=axs.flatten()[i])
+    axs.flatten()[i].set_title('Distribuzione di ' + col)
+    i += 1
+
+plt.tight_layout()
+plt.show()
