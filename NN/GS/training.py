@@ -55,3 +55,38 @@ y_encoded = y_encoded[:-761]
 
 # Divisione in training e validation set
 X_train, X_val, y_train, y_val = train_test_split(X_final, y_encoded, test_size=0.2, random_state=42)
+
+
+# Funzione per creare una rete neurale
+def create_network(input_dim, neurons_1layer, neurons_2layer, activation_function):
+    inputs = tf.keras.Input((input_dim,))
+    x = layers.Dense(neurons_1layer, activation_function)(inputs)
+    x = layers.Dense(neurons_2layer, activation_function)(x)
+    x = layers.Dropout(0.1)(x)
+    output = layers.Dense(3, "softmax")(x)
+    model = tf.keras.Model(inputs=inputs, outputs=output, name="neural_net")
+    return model
+
+# Griglia di iperparametri
+GRID_SEARCH = {
+    "learning_rate": [1e-3],
+    "epochs": [5, 6, 7, 8, 9, 10],
+    "neurons_1layer": [50, 55],
+    "neurons_2layer": [30, 50],
+    "activation_functions": ['relu', 'sigmoid', 'tanh'],
+    "batch_size": [200]
+}
+
+# Creazione di tutte le combinazioni di iperparametri
+grid_combinations = list(itertools.product(
+    GRID_SEARCH['learning_rate'],
+    GRID_SEARCH['epochs'],
+    GRID_SEARCH['neurons_1layer'],
+    GRID_SEARCH['neurons_2layer'],
+    GRID_SEARCH['activation_functions'],
+    GRID_SEARCH['batch_size']
+))
+
+# Variabili per tenere traccia dei migliori iperparametri
+best_params = None
+best_val_loss = np.inf
