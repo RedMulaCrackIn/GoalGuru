@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
 # Configurazione delle opzioni di visualizzazione per i DataFrame
 pd.set_option('display.max_columns', None)
 
@@ -13,7 +12,6 @@ warnings.filterwarnings('ignore')
 
 # Caricamento del dataset
 df = pd.read_csv('matches.csv')
-
 
 # Visualizzazione delle prime righe del dataset
 print("Prime righe del dataset:")
@@ -50,7 +48,6 @@ df["day_code"] = df["date"].dt.dayofweek
 
 # Verifica dei duplicati nel dataset
 print("\nNumero di duplicati nel dataset:", df.duplicated().sum())
-
 
 #PULIAMO PRIMA DI STAMPARE
 df.formation = df.formation.str.replace("◆", "")
@@ -96,8 +93,6 @@ group = df.groupby('team', observed=False)['captain'].value_counts().reset_index
 group = group.apply(captains_func, axis=1)
 group.dropna(inplace=True)
 group = group.drop(columns='count')
-
-
 
 # Esempio: Capitani del Liverpool
 print("\nCapitani del Liverpool:")
@@ -224,8 +219,6 @@ def categorize_time(time):
         return 'afternoon'
     else:
         return 'evening'
-
-
 
 # Pulizia della colonna 'time' e applicazione della categorizzazione
 df_sorted['time'] = df_sorted['time'].apply(lambda x: x.split(' ')[0])
