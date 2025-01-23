@@ -93,3 +93,23 @@ def captains_func(data):
         data['count'] = np.nan
     return data
 
+
+# Conteggio dei capitani per squadra
+group = df.groupby('team', observed=False)['captain'].value_counts().reset_index(name='count')
+group = group.apply(captains_func, axis=1)
+group.dropna(inplace=True)
+group = group.drop(columns='count')
+
+# Esempio: Capitani del Liverpool
+print("\nCapitani del Liverpool:")
+print(group[group['team'] == 'Liverpool'])
+
+# Conversione della colonna 'date' in formato datetime (se non già fatto)
+df['date'] = pd.to_datetime(df['date'])
+
+# Ordinamento del dataset per squadra e data
+df_sorted = df.sort_values(['team', 'date'])
+
+# Reset dell'indice per riflettere il nuovo ordine
+df_sorted = df_sorted.reset_index(drop=True)
+
