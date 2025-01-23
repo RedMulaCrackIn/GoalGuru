@@ -37,3 +37,21 @@ X_numerical_scaled = pd.DataFrame(scaler.fit_transform(X[numerical_cols]), colum
 X_categorical_encoded = X_categorical_encoded.reset_index(drop=True)
 X_numerical_scaled = X_numerical_scaled.reset_index(drop=True)
 X_final = pd.concat([X_categorical_encoded, X_numerical_scaled], axis=1)
+
+
+# Codifica del target (y) in valori numerici
+label_encoder = LabelEncoder()
+y_encoded = label_encoder.fit_transform(y)
+
+# Creazione del test set (ultima stagione)
+test_x = X_final.tail(761)
+test_y = y_encoded[-761:]
+test_x['result'] = test_y
+test_x.to_csv("test_set.csv", index=False)
+
+# Rimozione dell'ultima stagione dal training set
+X_final = X_final.iloc[:-761]
+y_encoded = y_encoded[:-761]
+
+# Divisione in training e validation set
+X_train, X_val, y_train, y_val = train_test_split(X_final, y_encoded, test_size=0.2, random_state=42)
