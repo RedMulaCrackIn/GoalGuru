@@ -278,3 +278,4 @@ predictors = num_cols + cat_cols
 
 # Salvataggio del dataset pre-processato
 df_sorted.to_csv('matches_final.csv', index=False)
+
