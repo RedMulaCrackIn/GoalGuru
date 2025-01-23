@@ -46,3 +46,16 @@ df["hour"] = df["time"].str.replace(":.+", "", regex=True).astype("int")
 
 # Aggiunta di una colonna 'day_code' per il giorno della settimana (0 = Lunedì, 6 = Domenica)
 df["day_code"] = df["date"].dt.dayofweek
+
+
+
+# Verifica dei duplicati nel dataset
+print("\nNumero di duplicati nel dataset:", df.duplicated().sum())
+
+#PULIAMO PRIMA DI STAMPARE
+df.formation = df.formation.str.replace("◆", "")
+df.formation = df.formation.str.replace("-0", "")
+
+# Analisi delle formazioni più comuni
+print("\nConteggio delle formazioni:")
+print(df.formation.value_counts())
