@@ -1,13 +1,8 @@
-KNN
-
 pip install pandas
 
 pip install scikit-learn
 
 pip install seaborn
 
-
-NN/RS
-
-
+pip install tensorflow
 
