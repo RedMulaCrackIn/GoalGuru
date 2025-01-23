@@ -59,3 +59,17 @@ df.formation = df.formation.str.replace("-0", "")
 # Analisi delle formazioni più comuni
 print("\nConteggio delle formazioni:")
 print(df.formation.value_counts())
+
+
+# Rimozione di caratteri speciali dalla colonna 'formation'
+df.formation = df.formation.str.replace("◆", "")
+df.formation = df.formation.str.replace("-0", "")
+
+# Categorizzazione delle formazioni meno comuni come "Altro"
+value_counts = df.formation.value_counts()
+to_replace = value_counts[value_counts < 107].index
+df['formation'] = df['formation'].replace(to_replace, 'Altro')
+
+# Verifica delle formazioni dopo la pulizia
+print("\nConteggio delle formazioni dopo la pulizia:")
+print(df.formation.value_counts())
