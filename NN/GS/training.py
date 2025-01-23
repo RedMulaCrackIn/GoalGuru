@@ -90,3 +90,46 @@ grid_combinations = list(itertools.product(
 # Variabili per tenere traccia dei migliori iperparametri
 best_params = None
 best_val_loss = np.inf
+
+
+# Ciclo per testare ogni combinazione di iperparametri
+for combination in grid_combinations:
+    learning_rate, epochs, neurons_1layer, neurons_2layer, activation_function, batch_size = combination
+
+    print(f"Testing combination: lr={learning_rate}, epochs={epochs}, neurons_1layer={neurons_1layer}, neurons_2layer={neurons_2layer}, activation={activation_function}, batch_size={batch_size}")
+
+    # Creazione del modello con i parametri correnti
+    model = create_network(X_train.shape[1], neurons_1layer, neurons_2layer, activation_function)
+
+    # Compilazione del modello
+    model.compile(
+        loss='sparse_categorical_crossentropy',
+        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+        metrics=['accuracy']
+    )
+
+    # Addestramento del modello
+    history = model.fit(
+        X_train, y_train,
+        validation_data=(X_val, y_val),
+        epochs=epochs,
+        batch_size=batch_size,
+        verbose=0  # Nessun output durante la ricerca
+    )
+
+    # Valutazione della loss sul validation set
+    final_val_loss = history.history['val_loss'][-1]
+
+    print(f"Validation loss: {final_val_loss}")
+
+    # Aggiornamento dei migliori iperparametri
+    if final_val_loss < best_val_loss:
+        best_val_loss = final_val_loss
+        best_params = {
+            "learning_rate": learning_rate,
+            "epochs": epochs,
+            "neurons_1layer": neurons_1layer,
+            "neurons_2layer": neurons_2layer,
+            "activation_function": activation_function,
+            "batch_size": batch_size
+        }
