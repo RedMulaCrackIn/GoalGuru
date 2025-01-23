@@ -73,3 +73,23 @@ df['formation'] = df['formation'].replace(to_replace, 'Altro')
 # Verifica delle formazioni dopo la pulizia
 print("\nConteggio delle formazioni dopo la pulizia:")
 print(df.formation.value_counts())
+
+
+# Assegnazione dei punti in base al risultato (W = 3, D = 1, L = 0)
+df['points'] = df['result'].apply(lambda x: 3 if x == 'W' else 1 if x == 'D' else 0)
+df['points'] = df['points'].astype('int')
+
+# Calcolo dei vincitori di ogni stagione
+winners = df.groupby(['season', 'team'], observed=False)['points'].sum().reset_index() \
+  .sort_values(['season', 'points'], ascending=[True, False]) \
+  .groupby('season', observed=False).first()
+
+# Aggiunta della colonna 'season_winner' per indicare il vincitore della stagione
+df['season_winner'] = df['season'].map(winners['team'])
+
+# Funzione per gestire i valori mancanti nella colonna 'captain'
+def captains_func(data):
+    if data['count'] == 0:
+        data['count'] = np.nan
+    return data
+
