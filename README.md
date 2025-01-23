@@ -14,12 +14,8 @@ GoalGuru utilizza una rete neurale avanzata per prevedere i risultati delle part
 ## Contenuto del Repository
 Il repository contiene le seguenti risorse:
 - **Codice principale**: Script Python per l'elaborazione, il training e l'inferenza del modello.
-  - `data_preprocessing.py`: Script per la pulizia e trasformazione dei dati.
-  - `train_model.py`: Script per addestrare il modello.
-  - `evaluate_model.py`: Script per la valutazione del modello.
-  - `predict.py`: Script per eseguire previsioni sui nuovi dati.
 - **Notebook**: File `.ipynb` per analisi ed esplorazioni interattive.
-- **Dataset**: Link o file per accedere al dataset utilizzato (ad esempio, tramite Kaggle).
+- **Dataset**: file per accedere al dataset utilizzato 
 - **Risultati**: Report e visualizzazioni delle performance del modello.
 - **Documentazione**: Dettagli sui processi di modellazione e sperimentazione.
 
@@ -31,8 +27,7 @@ Il repository contiene le seguenti risorse:
   - Manipolazione dati: `pandas`, `numpy`
   - Visualizzazione: `matplotlib`, `seaborn`
   - Modellazione: `scikit-learn`, `tensorflow`
-  - Utilità: `jupyter` (opzionale per i notebook)
-- **Dataset**: Dataset scaricabile da [Kaggle](https://www.kaggle.com/).
+- **Dataset**: /GoalGuru/DATASET
 
 ---
 
@@ -45,9 +40,8 @@ Il repository contiene le seguenti risorse:
    ```bash
    pip install -r requirements.txt
    
-3. Visita Kaggle per scaricare il dataset necessario:
+3. /GoalGuru/DATASET scaricare il dataset necessario
    
-   https://www.kaggle.com/datasets/mhmdkardosha/premier-league-matches
 
 ## Come Riprodurre il Lavoro
 
