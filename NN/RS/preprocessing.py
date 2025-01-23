@@ -206,3 +206,25 @@ df_sorted['form'] = calculate_rolling_average(df_sorted, 'result_encoded')
 # Calcolo della differenza reti e della sua media mobile
 df_sorted['goal_diff'] = df_sorted['gf'] - df_sorted['ga']
 df_sorted['rolling_goal_diff'] = calculate_rolling_average(df_sorted, 'goal_diff')
+
+def get_head_to_head(data):
+    h2h = data.groupby(['team', 'opponent'], observed=False)['result_encoded'].mean().reset_index()
+    h2h = h2h.rename(columns={'result_encoded': 'h2h_record'})
+    result = pd.merge(data, h2h, on=['team', 'opponent'], how='left')
+    return result
+
+# Applicazione della funzione
+df_sorted = get_head_to_head(df_sorted)
+
+# Conversione della data in giorno della settimana (0 = Lunedì, 6 = Domenica)
+df_sorted['day_of_week'] = pd.to_datetime(df_sorted['date']).dt.dayofweek
+
+# Funzione per categorizzare l'orario delle partite
+def categorize_time(time):
+    hour = pd.to_datetime(time).hour
+    if hour < 12:
+        return 'early'
+    elif hour < 17:
+        return 'afternoon'
+    else:
+        return 'evening'
