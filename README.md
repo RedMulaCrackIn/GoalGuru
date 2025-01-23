@@ -14,7 +14,6 @@ GoalGuru utilizza una rete neurale avanzata per prevedere i risultati delle part
 ## Contenuto del Repository
 Il repository contiene le seguenti risorse:
 - **Codice principale**: Script Python per l'elaborazione, il training e l'inferenza del modello.
-- **Notebook**: File `.ipynb` per analisi ed esplorazioni interattive.
 - **Dataset**: file per accedere al dataset utilizzato 
 - **Risultati**: Report e visualizzazioni delle performance del modello.
 - **Documentazione**: Dettagli sui processi di modellazione e sperimentazione.
