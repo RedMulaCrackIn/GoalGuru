@@ -162,3 +162,25 @@ for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage'
 
 plt.tight_layout()
 plt.show()
+
+# Boxplot per le stesse metriche
+fig, axs = plt.subplots(2, 2, figsize=(12, 6))
+i = 0
+for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']:
+    sns.boxplot(x=df_sorted[col], ax=axs.flatten()[i])
+    axs.flatten()[i].set_title('Distribuzione di ' + col)
+    i += 1
+
+# Statistiche descrittive delle metriche
+print("\nStatistiche delle metriche calcolate:")
+print(df_sorted[['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']].agg(['mean', 'min', 'max']))
+
+plt.tight_layout()
+plt.show()
+
+# Funzione per calcolare la media mobile
+def calculate_rolling_average(data, column, window=5):
+    return data.groupby('team', observed=False)[column].transform(
+        lambda x: x.rolling(window=window, min_periods=1).mean()
+    )
+
