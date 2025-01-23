@@ -184,3 +184,43 @@ def calculate_rolling_average(data, column, window=5):
         lambda x: x.rolling(window=window, min_periods=1).mean()
     )
 
+# Applicazione della funzione alle colonne selezionate
+df_sorted['rolling_xg'] = calculate_rolling_average(df_sorted, 'xg')
+df_sorted['rolling_xga'] = calculate_rolling_average(df_sorted, 'xga')
+df_sorted['rolling_poss'] = calculate_rolling_average(df_sorted, 'poss')
+df_sorted['rolling_sh'] = calculate_rolling_average(df_sorted, 'sh')
+df_sorted['rolling_sot'] = calculate_rolling_average(df_sorted, 'sot')
+df_sorted['rolling_dist'] = calculate_rolling_average(df_sorted, 'dist')
+
+# Codifica del risultato in valori numerici (W = 1, D = 0, L = -1)
+df_sorted['result_encoded'] = pd.to_numeric(df_sorted['result'].map({'W': 1, 'D': 0, 'L': -1}))
+
+# Calcolo della forma (media mobile dei risultati)
+df_sorted['form'] = calculate_rolling_average(df_sorted, 'result_encoded')
+
+# Calcolo della differenza reti e della sua media mobile
+df_sorted['goal_diff'] = df_sorted['gf'] - df_sorted['ga']
+df_sorted['rolling_goal_diff'] = calculate_rolling_average(df_sorted, 'goal_diff')
+
+# Funzione per calcolare il confronto diretto
+def get_head_to_head(data):
+    h2h = data.groupby(['team', 'opponent'], observed=False)['result_encoded'].mean().reset_index()
+    h2h = h2h.rename(columns={'result_encoded': 'h2h_record'})
+    result = pd.merge(data, h2h, on=['team', 'opponent'], how='left')
+    return result
+
+# Applicazione della funzione
+df_sorted = get_head_to_head(df_sorted)
+
+# Conversione della data in giorno della settimana (0 = Lunedì, 6 = Domenica)
+df_sorted['day_of_week'] = pd.to_datetime(df_sorted['date']).dt.dayofweek
+
+# Funzione per categorizzare l'orario delle partite
+def categorize_time(time):
+    hour = pd.to_datetime(time).hour
+    if hour < 12:
+        return 'early'
+    elif hour < 17:
+        return 'afternoon'
+    else:
+        return 'evening'
