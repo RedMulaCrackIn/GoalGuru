@@ -67,7 +67,7 @@ Addestra il modello utilizzando lo script `training.py`. Puoi configurare i para
   ```
 
 ### 4. Predizioni
-Genera previsioni sui nuovi dati utilizzando lo script finaltest.py. Fornisci un input personalizzato per ottenere le probabilità predette per vittoria, pareggio o sconfitta.
+Genera previsioni sui nuovi dati utilizzando lo script `finaltest.py`. Fornisci un input personalizzato per ottenere le probabilità predette per vittoria, pareggio o sconfitta.
 
   Esegui il comando:
   ```bash
