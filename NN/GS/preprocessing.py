@@ -165,3 +165,24 @@ for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage'
     sns.boxplot(x=df_sorted[col], ax=axs.flatten()[i])
     axs.flatten()[i].set_title('Distribuzione di ' + col)
     i += 1
+
+# Statistiche descrittive delle metriche
+print("\nStatistiche delle metriche calcolate:")
+print(df_sorted[['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']].agg(['mean', 'min', 'max']))
+
+plt.tight_layout()
+plt.show()
+
+# Funzione per calcolare la media mobile
+def calculate_rolling_average(data, column, window=5):
+    return data.groupby('team', observed=False)[column].transform(
+        lambda x: x.rolling(window=window, min_periods=1).mean()
+    )
+
+# Applicazione della funzione alle colonne selezionate
+df_sorted['rolling_xg'] = calculate_rolling_average(df_sorted, 'xg')
+df_sorted['rolling_xga'] = calculate_rolling_average(df_sorted, 'xga')
+df_sorted['rolling_poss'] = calculate_rolling_average(df_sorted, 'poss')
+df_sorted['rolling_sh'] = calculate_rolling_average(df_sorted, 'sh')
+df_sorted['rolling_sot'] = calculate_rolling_average(df_sorted, 'sot')
+df_sorted['rolling_dist'] = calculate_rolling_average(df_sorted, 'dist')
