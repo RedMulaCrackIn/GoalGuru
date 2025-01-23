@@ -24,3 +24,15 @@ print(df.describe())
 # Informazioni generali sul dataset (tipi di dati, valori non nulli)
 print("\nInformazioni sul dataset:")
 print(df.info())
+
+# Rimozione delle colonne non necessarie
+df.drop(columns=["Unnamed: 0", "comp", "round", "attendance", "match report", "notes"], inplace=True)
+
+# Conversione della colonna 'date' in formato datetime
+df["date"] = pd.to_datetime(df["date"])
+
+# Conversione di alcune colonne in tipo 'category' per ottimizzare la memoria
+df['venue'] = df['venue'].astype('category')
+df['opponent'] = df['opponent'].astype('category')
+df['team'] = df['team'].astype('category')
+df['result'] = df['result'].astype('category')
