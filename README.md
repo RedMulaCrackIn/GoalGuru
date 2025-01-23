@@ -46,40 +46,32 @@ Il repository contiene le seguenti risorse:
 ## Come Riprodurre il Lavoro
 
 ### 1. Esplorazione dei dati
-Apri ed esegui il notebook `data_exploration.ipynb` per analizzare il dataset in modo preliminare. Questo ti aiuterà a comprendere la struttura e le caratteristiche principali dei dati.
+Apri /GoalGuru/DATASET per analizzare il dataset in modo preliminare. Questo ti aiuterà a comprendere la struttura e le caratteristiche principali dei dati.
 
 ### 2. Pre-elaborazione dei dati
-Esegui lo script `data_preprocessing.py` per pulire e trasformare i dati. Questo passaggio include:
+Esegui lo script `preprocessing.py` per pulire e trasformare i dati. Questo passaggio include:
 - Rimozione dei valori nulli e delle colonne irrilevanti.
 - Codifica delle variabili categoriali.
 - Scaling delle variabili numeriche.
   
   Esegui il comando:
   ```bash
-  python data_preprocessing.py
+  python preprocessing.py
 
 ## 3. Addestramento del modello
-Addestra la rete neurale utilizzando lo script `train_model.py`. Puoi configurare i parametri del modello modificando le variabili all'inizio del file.
+Addestra il modello utilizzando lo script `training.py`. Puoi configurare i parametri del modello modificando le variabili all'inizio del file.
 
   Esegui il comando:
   ```bash
-  python train_model.py
+  python training.py
   ```
 
-## 4. Valutazione
-Testa il modello sui dati di validazione per valutare le sue performance. Usa lo script evaluate_model.py per generare metriche come accuratezza e confusion matrix.
+## 4. Predizioni
+Genera previsioni sui nuovi dati utilizzando lo script finaltest.py. Fornisci un input personalizzato per ottenere le probabilità predette per vittoria, pareggio o sconfitta.
 
   Esegui il comando:
   ```bash
-  python evaluate_model.py
-  ```
-
-## 5. Predizioni
-Genera previsioni sui nuovi dati utilizzando lo script predict.py. Fornisci un input personalizzato per ottenere le probabilità predette per vittoria, pareggio o sconfitta.
-
-  Esegui il comando:
-  ```bash
-  python predict.py
+  python finaltest.py
   ```
 
 
