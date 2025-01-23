@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
 # Configurazione delle opzioni di visualizzazione per i DataFrame
 pd.set_option('display.max_columns', None)
 
@@ -13,7 +12,6 @@ warnings.filterwarnings('ignore')
 
 # Caricamento del dataset
 df = pd.read_csv('matches.csv')
-
 
 # Visualizzazione delle prime righe del dataset
 print("Prime righe del dataset:")
@@ -50,7 +48,6 @@ df["day_code"] = df["date"].dt.dayofweek
 
 # Verifica dei duplicati nel dataset
 print("\nNumero di duplicati nel dataset:", df.duplicated().sum())
-
 
 #PULIAMO PRIMA DI STAMPARE
 df.formation = df.formation.str.replace("◆", "")
@@ -96,8 +93,6 @@ group = df.groupby('team', observed=False)['captain'].value_counts().reset_index
 group = group.apply(captains_func, axis=1)
 group.dropna(inplace=True)
 group = group.drop(columns='count')
-
-
 
 # Esempio: Capitani del Liverpool
 print("\nCapitani del Liverpool:")
@@ -145,3 +140,130 @@ def calculate_fk_pk_ratios(data):
     data['pk_per_shot_percentage'] = data['pk_per_shot'] * 100
 
     return data
+
+# Applicazione della funzione
+df_sorted = calculate_fk_pk_ratios(df_sorted)
+
+# Rimozione delle colonne non necessarie
+df_sorted.drop(['pk_conversion_rate', 'pk_conversion_percentage'], axis=1, inplace=True)
+
+# Creazione di una figura con 4 subplot
+fig, axs = plt.subplots(2, 2, figsize=(12, 6))
+i = 0
+for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']:
+    sns.histplot(df_sorted[col], kde=True, ax=axs.flatten()[i])
+    axs.flatten()[i].set_title('Distribuzione di ' + col)
+    i += 1
+
+plt.tight_layout()
+plt.show()
+
+# Boxplot per le stesse metriche
+fig, axs = plt.subplots(2, 2, figsize=(12, 6))
+i = 0
+for col in ['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']:
+    sns.boxplot(x=df_sorted[col], ax=axs.flatten()[i])
+    axs.flatten()[i].set_title('Distribuzione di ' + col)
+    i += 1
+
+# Statistiche descrittive delle metriche
+print("\nStatistiche delle metriche calcolate:")
+print(df_sorted[['fk_ratio', 'pk_per_shot', 'fk_percentage', 'pk_per_shot_percentage']].agg(['mean', 'min', 'max']))
+
+plt.tight_layout()
+plt.show()
+
+# Funzione per calcolare la media mobile
+def calculate_rolling_average(data, column, window=5):
+    return data.groupby('team', observed=False)[column].transform(
+        lambda x: x.rolling(window=window, min_periods=1).mean()
+    )
+
+# Applicazione della funzione alle colonne selezionate
+df_sorted['rolling_xg'] = calculate_rolling_average(df_sorted, 'xg')
+df_sorted['rolling_xga'] = calculate_rolling_average(df_sorted, 'xga')
+df_sorted['rolling_poss'] = calculate_rolling_average(df_sorted, 'poss')
+df_sorted['rolling_sh'] = calculate_rolling_average(df_sorted, 'sh')
+df_sorted['rolling_sot'] = calculate_rolling_average(df_sorted, 'sot')
+df_sorted['rolling_dist'] = calculate_rolling_average(df_sorted, 'dist')
+
+# Codifica del risultato in valori numerici (W = 1, D = 0, L = -1)
+df_sorted['result_encoded'] = pd.to_numeric(df_sorted['result'].map({'W': 1, 'D': 0, 'L': -1}))
+
+# Calcolo della forma (media mobile dei risultati)
+df_sorted['form'] = calculate_rolling_average(df_sorted, 'result_encoded')
+
+# Calcolo della differenza reti e della sua media mobile
+df_sorted['goal_diff'] = df_sorted['gf'] - df_sorted['ga']
+df_sorted['rolling_goal_diff'] = calculate_rolling_average(df_sorted, 'goal_diff')
+
+# Funzione per calcolare il confronto diretto
+def get_head_to_head(data):
+    h2h = data.groupby(['team', 'opponent'], observed=False)['result_encoded'].mean().reset_index()
+    h2h = h2h.rename(columns={'result_encoded': 'h2h_record'})
+    result = pd.merge(data, h2h, on=['team', 'opponent'], how='left')
+    return result
+
+# Applicazione della funzione
+df_sorted = get_head_to_head(df_sorted)
+
+# Conversione della data in giorno della settimana (0 = Lunedì, 6 = Domenica)
+df_sorted['day_of_week'] = pd.to_datetime(df_sorted['date']).dt.dayofweek
+
+# Funzione per categorizzare l'orario delle partite
+def categorize_time(time):
+    hour = pd.to_datetime(time).hour
+    if hour < 12:
+        return 'early'
+    elif hour < 17:
+        return 'afternoon'
+    else:
+        return 'evening'
+
+# Pulizia della colonna 'time' e applicazione della categorizzazione
+df_sorted['time'] = df_sorted['time'].apply(lambda x: x.split(' ')[0])
+df_sorted['time_condition'] = df_sorted['time'].apply(categorize_time)
+
+# Conteggio delle partite per fascia oraria
+print("\nConteggio delle partite per fascia oraria:")
+print(df_sorted['time_condition'].value_counts())
+
+# Calcolo dei giorni trascorsi dall'ultima partita
+df_sorted['days_since_last_match'] = df_sorted.groupby('team', observed=False)['date'].diff().dt.days
+df_sorted['days_since_last_match'] = df_sorted['days_since_last_match'].fillna(0)
+
+# Rimozione delle colonne non necessarie
+columns_to_drop = ['gf', 'ga', 'xg', 'xga', 'poss', 'sh', 'sot',
+                   'goal_diff', 'day', 'pk', 'pkatt', 'fk',
+                   'referee', 'dist','points', 'season_winner', 'hour', 'result_encoded', 'day_code']
+df_sorted = df_sorted.drop(columns=columns_to_drop)
+
+# Selezione delle colonne numeriche e categoriche
+num_cols = df_sorted.select_dtypes(include=np.number).columns
+num_cols = num_cols.drop(['season'])
+num_cols = num_cols.tolist()
+cat_cols = df_sorted.select_dtypes(exclude=np.number).columns
+cat_cols = cat_cols.drop(['result', 'date'])
+cat_cols = cat_cols.tolist()
+predictors = num_cols + cat_cols
+
+# Rimozione delle righe con valori mancanti
+df_sorted.dropna(inplace=True)
+
+# Pulizia dei nomi delle colonne
+df_sorted.columns = df_sorted.columns.str.strip()
+df_sorted = df_sorted[df_sorted.columns.tolist()[1:]]
+
+# Categorizzazione della colonna 'time'
+df_sorted['time'] = df_sorted['time'].astype('category')
+value_counts = df_sorted.time.value_counts()
+to_replace = value_counts[value_counts < 102].index
+df_sorted['time'] = df_sorted['time'].replace(to_replace, 'Altro')
+
+# Aggiornamento delle colonne categoriche e numeriche
+cat_cols = df_sorted.select_dtypes(exclude=np.number).columns.tolist()
+num_cols = df_sorted.select_dtypes(include=np.number).columns.tolist()
+predictors = num_cols + cat_cols
+
+# Salvataggio del dataset pre-processato
+df_sorted.to_csv('matches_final.csv', index=False)
