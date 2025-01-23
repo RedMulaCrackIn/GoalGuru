@@ -28,3 +28,23 @@ print(f"Test accuracy: {test_accuracy}")
 # Generazione del report di classificazione
 print("\nReport di classificazione:")
 print(classification_report(ts_y, y_pred))
+
+# Calcolo della matrice di confusione
+conf_matrix = confusion_matrix(ts_y, y_pred)
+
+# Visualizzazione della matrice di confusione
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues',
+            xticklabels=['Loss', 'Draw', 'Win'],
+            yticklabels=['Loss', 'Draw', 'Win'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Matrice di Confusione')
+plt.savefig('matrice_di_confusione.png')  # Salva la figura in un file
+plt.show()
+
+# Salvataggio dei risultati in un file di testo
+with open("test_results.txt", "w") as f:
+    f.write(f"Test accuracy: {test_accuracy}\n")
+    f.write("\nReport di classificazione:\n")
+    f.write(classification_report(ts_y, y_pred))
