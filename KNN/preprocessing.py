@@ -14,3 +14,39 @@ warnings.filterwarnings('ignore')
 # Caricamento del dataset
 df = pd.read_csv('matches.csv')
 
+
+# Visualizzazione delle prime righe del dataset
+print("Prime righe del dataset:")
+print(df.head())
+
+# Statistiche descrittive del dataset
+print("\nStatistiche descrittive:")
+print(df.describe())
+
+# Informazioni generali sul dataset (tipi di dati, valori non nulli)
+print("\nInformazioni sul dataset:")
+print(df.info())
+
+# Rimozione delle colonne non necessarie
+df.drop(columns=["Unnamed: 0", "comp", "round", "attendance", "match report", "notes"], inplace=True)
+
+# Conversione della colonna 'date' in formato datetime
+df["date"] = pd.to_datetime(df["date"])
+
+# Conversione di alcune colonne in tipo 'category' per ottimizzare la memoria
+df['venue'] = df['venue'].astype('category')
+df['opponent'] = df['opponent'].astype('category')
+df['team'] = df['team'].astype('category')
+df['result'] = df['result'].astype('category')
+
+# Aggiunta di una colonna 'day' per il giorno della settimana
+df['day'] = df['date'].dt.day_name()
+
+# Estrazione dell'ora dalla colonna 'time'
+df["hour"] = df["time"].str.replace(":.+", "", regex=True).astype("int")
+
+# Aggiunta di una colonna 'day_code' per il giorno della settimana (0 = Lunedì, 6 = Domenica)
+df["day_code"] = df["date"].dt.dayofweek
+
+# Verifica dei duplicati nel dataset
+print("\nNumero di duplicati nel dataset:", df.duplicated().sum())
