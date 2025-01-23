@@ -106,3 +106,35 @@ for combination in grid_combinations:
 print("Best hyperparameters found:")
 print(best_params)
 print(f"Best validation accuracy: {best_val_accuracy}")
+
+
+
+# Creazione del modello KNN con i migliori iperparametri
+best_model = KNeighborsClassifier(
+    n_neighbors=best_params["n_neighbors"],
+    weights=best_params["weights"],
+    metric=best_params["metric"]
+)
+
+# Addestramento del modello
+best_model.fit(X_train, y_train)
+
+# Valutazione del modello sul validation set
+val_predictions = best_model.predict(X_val)
+val_accuracy = accuracy_score(y_val, val_predictions)
+
+print(f"Final validation accuracy with best hyperparameters: {val_accuracy}")
+
+# Salvataggio del modello
+with open("best_knn_model.pkl", "wb") as f:
+    pickle.dump(best_model, f)
+
+# Plot dell'accuratezza durante la ricerca degli iperparametri
+plt.figure(figsize=(8, 6))
+plt.plot(val_accuracies, label='Validation Accuracy')
+plt.title('Validation Accuracy during Hyperparameter Search')
+plt.xlabel('Combination Index')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.savefig('validation_accuracy.png')
+plt.show()
