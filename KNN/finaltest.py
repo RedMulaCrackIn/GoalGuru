@@ -15,3 +15,16 @@ ts_y = ts['result']
 # Caricamento del modello KNN pre-addestrato
 with open("best_knn_model.pkl", "rb") as f:
     best_model = pickle.load(f)
+
+    # Predizione delle classi sul test set
+y_pred = best_model.predict(ts_x)
+
+# Calcolo dell'accuratezza sul test set
+test_accuracy = accuracy_score(ts_y, y_pred)
+
+# Stampa dell'accuratezza
+print(f"Test accuracy: {test_accuracy}")
+
+# Generazione del report di classificazione
+print("\nReport di classificazione:")
+print(classification_report(ts_y, y_pred))
