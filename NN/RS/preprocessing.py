@@ -36,3 +36,13 @@ df['venue'] = df['venue'].astype('category')
 df['opponent'] = df['opponent'].astype('category')
 df['team'] = df['team'].astype('category')
 df['result'] = df['result'].astype('category')
+
+
+# Aggiunta di una colonna 'day' per il giorno della settimana
+df['day'] = df['date'].dt.day_name()
+
+# Estrazione dell'ora dalla colonna 'time'
+df["hour"] = df["time"].str.replace(":.+", "", regex=True).astype("int")
+
+# Aggiunta di una colonna 'day_code' per il giorno della settimana (0 = Lunedì, 6 = Domenica)
+df["day_code"] = df["date"].dt.dayofweek
