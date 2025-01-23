@@ -53,3 +53,89 @@ test_x.to_csv("test_set.csv", index=False)
 # Rimozione dell'ultima stagione dal training set
 X_final = X_final.iloc[:-761]
 y_encoded = y_encoded[:-761]
+
+
+# Divisione in training e validation set
+X_train, X_val, y_train, y_val = train_test_split(X_final, y_encoded, test_size=0.2, random_state=42)
+
+# Funzione per creare una rete neurale
+def create_network(input_dim, neurons_1layer, neurons_2layer, activation_function):
+    inputs = tf.keras.Input((input_dim,))
+    x = layers.Dense(neurons_1layer, activation_function)(inputs)
+    x = layers.Dense(neurons_2layer, activation_function)(x)
+    x = layers.Dropout(0.1)(x)
+    output = layers.Dense(3, "softmax")(x)
+    model = tf.keras.Model(inputs=inputs, outputs=output, name="neural_net")
+    return model
+
+# Definizione dello spazio degli iperparametri per Random Search
+RANDOM_SEARCH_SPACE = {
+    "learning_rate": [1e-3, 1e-4, 1e-5],
+    "epochs": [5, 10, 15, 20],
+    "neurons_1layer": [30, 50, 70],
+    "neurons_2layer": [20, 40, 60],
+    "activation_functions": ['relu', 'sigmoid', 'tanh'],
+    "batch_size": [100, 200, 300]
+}
+
+
+# Numero di combinazioni casuali da provare
+NUM_RANDOM_COMBINATIONS = 20
+
+# Variabili per tenere traccia dei migliori iperparametri
+best_params = None
+best_val_loss = np.inf
+
+# Ciclo per testare combinazioni casuali di iperparametri
+for _ in range(NUM_RANDOM_COMBINATIONS):
+    # Selezione casuale degli iperparametri
+    learning_rate = random.choice(RANDOM_SEARCH_SPACE["learning_rate"])
+    epochs = random.choice(RANDOM_SEARCH_SPACE["epochs"])
+    neurons_1layer = random.choice(RANDOM_SEARCH_SPACE["neurons_1layer"])
+    neurons_2layer = random.choice(RANDOM_SEARCH_SPACE["neurons_2layer"])
+    activation_function = random.choice(RANDOM_SEARCH_SPACE["activation_functions"])
+    batch_size = random.choice(RANDOM_SEARCH_SPACE["batch_size"])
+
+    print(f"Testing combination: lr={learning_rate}, epochs={epochs}, neurons_1layer={neurons_1layer}, neurons_2layer={neurons_2layer}, activation={activation_function}, batch_size={batch_size}")
+
+    # Creazione del modello con i parametri correnti
+    model = create_network(X_train.shape[1], neurons_1layer, neurons_2layer, activation_function)
+
+    # Compilazione del modello
+    model.compile(
+        loss='sparse_categorical_crossentropy',
+        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+        metrics=['accuracy']
+    )
+
+    # Addestramento del modello
+    history = model.fit(
+        X_train, y_train,
+        validation_data=(X_val, y_val),
+        epochs=epochs,
+        batch_size=batch_size,
+        verbose=0  # Nessun output durante la ricerca
+    )
+
+    # Valutazione della loss sul validation set
+    final_val_loss = history.history['val_loss'][-1]
+
+    print(f"Validation loss: {final_val_loss}")
+
+    # Aggiornamento dei migliori iperparametri
+    if final_val_loss < best_val_loss:
+        best_val_loss = final_val_loss
+        best_params = {
+            "learning_rate": learning_rate,
+            "epochs": epochs,
+            "neurons_1layer": neurons_1layer,
+            "neurons_2layer": neurons_2layer,
+            "activation_function": activation_function,
+            "batch_size": batch_size
+        }
+
+# Stampa dei migliori iperparametri
+print("Best hyperparameters found:")
+print(best_params)
+print(f"Best validation loss: {best_val_loss}")
+
