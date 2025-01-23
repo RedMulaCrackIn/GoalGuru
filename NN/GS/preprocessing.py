@@ -117,3 +117,29 @@ def verify_sorting(data):
 
 # Verifica dell'ordinamento
 verify_sorting(df_sorted)
+
+# Conversione delle colonne numeriche in tipo float
+num_cols = ['sh', 'sot', 'dist', 'fk', 'pk', 'pkatt', 'xga', 'xg', 'gf', 'ga']
+for col in num_cols:
+    df_sorted[col] = pd.to_numeric(df_sorted[col])
+
+# Funzione per calcolare le metriche avanzate
+def calculate_fk_pk_ratios(data):
+    data['fk_ratio'] = data['fk'] / data['sh']
+    data['pk_conversion_rate'] = data['pk'] / data['pkatt']
+    data['pk_per_shot'] = data['pkatt'] / data['sh']
+
+    # Gestione dei valori infiniti
+    data['fk_ratio'] = data['fk_ratio'].replace([np.inf, -np.inf], np.nan)
+    data['pk_conversion_rate'] = data['pk_conversion_rate'].replace([np.inf, -np.inf], np.nan)
+    data['pk_per_shot'] = data['pk_per_shot'].replace([np.inf, -np.inf], np.nan)
+
+    # Conversione in percentuali
+    data['fk_percentage'] = data['fk_ratio'] * 100
+    data['pk_conversion_percentage'] = data['pk_conversion_rate'] * 100
+    data['pk_per_shot_percentage'] = data['pk_per_shot'] * 100
+
+    return data
+
+# Applicazione della funzione
+df_sorted = calculate_fk_pk_ratios(df_sorted)
